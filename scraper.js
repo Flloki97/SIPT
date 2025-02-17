@@ -5,8 +5,8 @@ const fs = require('fs');
 chromium.use(stealth());
 
 const urlsToScrape = [
-    'https://bigbrothervipalbania4.website/shiko-big-brother-vip-albania-4-live-kanali-1/', // First source
-    'https://bigbrothervipalbania4.website/shiko-big-brother-vip-albania-4-live-kanali-2/'  // Replace with second source URL
+    'https://www.bbvipfalas.com/2025/01/blog-post.html' // First source
+    // 'https://bigbrothervipalbania4.website/shiko-big-brother-vip-albania-4-live-kanali-2/'  // Replace with second source URL
 ];
 
 const m3uFilePath = 'docs/bigbrother.m3u'; // Save in docs/ for GitHub Pages
