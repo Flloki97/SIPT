@@ -2,10 +2,14 @@ name: Update M3U File
 
 on:
   schedule:
-    - cron: "*/3 * * * *" # Runs every 5 minutes
+    - cron: "*/3 * * * *" # Runs every 3 minutes
   push:
     branches:
       - main
+
+concurrency:
+  group: update-m3u
+  cancel-in-progress: true
 
 jobs:
   update-m3u:
@@ -28,5 +32,4 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add docs/bigbrother.m3u
-          git commit -m "Updated M3U file" || echo "No changes to commit"
-          git push
+          git diff --quiet && git diff --cached --quiet || (git commit -m "Updated M3U file" && git push)
