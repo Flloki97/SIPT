@@ -5,7 +5,7 @@ const fs = require('fs');
 chromium.use(stealth());
 
 const urlsToScrape = [
-    'https://bbvipal.net/' // First source
+    'https://bbvipal.org/' // First source
     // 'https://bigbrothervipalbania4.website/shiko-big-brother-vip-albania-4-live-kanali-2/'  // Replace with second source URL
 ];
 
