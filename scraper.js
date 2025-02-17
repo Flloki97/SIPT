@@ -53,29 +53,66 @@ async function getM3U8(url) {
     }
 }
 
+// Function to read the existing .m3u file
+function readExistingM3UFile() {
+    if (fs.existsSync(m3uFilePath)) {
+        const content = fs.readFileSync(m3uFilePath, 'utf8');
+        return content;
+    }
+    return null;
+}
+
 // Function to scrape sources and update M3U file
 async function updateM3UFile() {
-    try {
-        console.log("🔄 Updating M3U file...");
-        const m3u8Links = await Promise.all(urlsToScrape.map(url => getM3U8(url)));
-        const validLinks = m3u8Links.filter(link => link);
+    let attempts = 0;
+    const maxAttempts = 10; // Maximum number of attempts before giving up
 
-        if (validLinks.length === 0) {
-            console.log("❌ No valid .m3u8 links found.");
-            return;
+    while (attempts < maxAttempts) {
+        attempts++;
+        console.log(`🔄 Attempt ${attempts} to find .m3u8 links...`);
+
+        try {
+            const m3u8Links = await Promise.all(urlsToScrape.map(url => getM3U8(url)));
+            const validLinks = m3u8Links.filter(link => link);
+
+            if (validLinks.length === 0) {
+                console.log("❌ No valid .m3u8 links found. Retrying...");
+                continue; // Retry immediately
+            }
+
+            // Create M3U content
+            const newM3UContent = `#EXTM3U\n` + validLinks.map((link, index) => `#EXTINF:-1, Stream ${index + 1}\n${link}`).join("\n");
+
+            // Read existing M3U file
+            const existingM3UContent = readExistingM3UFile();
+
+            // Compare new content with existing content
+            if (newM3UContent === existingM3UContent) {
+                console.log("✅ No changes in .m3u8 links. Skipping update.");
+                return false; // No changes
+            }
+
+            // Save to file
+            fs.writeFileSync(m3uFilePath, newM3UContent);
+            console.log(`✅ M3U file updated: ${m3uFilePath}`);
+            return true; // Changes detected
+        } catch (error) {
+            console.error("❌ Error updating M3U file:", error);
         }
-
-        // Create M3U content
-        const m3uContent = `#EXTM3U\n` + validLinks.map((link, index) => `#EXTINF:-1, Stream ${index + 1}\n${link}`).join("\n");
-
-        // Save to file
-        fs.writeFileSync(m3uFilePath, m3uContent);
-        console.log(`✅ M3U file updated: ${m3uFilePath}`);
-    } catch (error) {
-        console.error("❌ Error updating M3U file:", error);
     }
+
+    console.log(`❌ Failed to find .m3u8 links after ${maxAttempts} attempts.`);
+    return false; // No changes after max attempts
 }
 
 // Update M3U file every 3 minutes
-setInterval(updateM3UFile, 3 * 60 * 1000); // 3 minutes
-updateM3UFile(); // Run immediately on startup
+setInterval(async () => {
+    const hasChanges = await updateM3UFile();
+    if (hasChanges) {
+        console.log("Changes detected. Triggering deployment...");
+        // You can trigger a deployment here if needed
+    }
+}, 3 * 60 * 1000); // 3 minutes
+
+// Run immediately on startup
+updateM3UFile();
