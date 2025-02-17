@@ -1,34 +1,32 @@
-name: Update Dependencies
+name: Update M3U File
 
 on:
+  schedule:
+    - cron: "*/3 * * * *" # Runs every 5 minutes
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
 jobs:
-  build:
+  update-m3u:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: npm install
-        working-directory: SIPT  # 👈 Ensure npm runs inside the SIPT folder
 
-      - name: Run build
-        run: npm run build
-        working-directory: SIPT  # 👈 Ensure build runs inside the SIPT folder
+      - name: Install Playwright
+        run: npx playwright install --with-deps
 
-      - name: Deploy
-        run: npm run deploy
-        working-directory: SIPT  # 👈 Ensure deploy runs inside the SIPT folder
+      - name: Run scraper
+        run: node scraper.js
+
+      - name: Commit and push updated M3U file
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add docs/bigbrother.m3u
+          git commit -m "Updated M3U file" || echo "No changes to commit"
+          git push
