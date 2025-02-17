@@ -2,7 +2,7 @@ name: Update M3U File Every 2 Minutes
 
 on:
   schedule:
-    - cron: '*/2 * * * *'  # Runs every 5 minutes
+    - cron: '*/2 * * * *'  # Runs every 2 minutes
   workflow_dispatch:  # Allows manual execution
 
 jobs:
@@ -18,7 +18,10 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install playwright-extra puppeteer-extra-plugin-stealth
+        run: |
+          npm init -y
+          npm install playwright-extra puppeteer-extra-plugin-stealth cheerio fs
+          npx playwright install --with-deps
 
       - name: Run scraper
         run: node scraper.js
