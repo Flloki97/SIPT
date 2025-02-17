@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Install Playwright
-        run: npx playwright install --with-deps
+        run: npx playwright install
 
       - name: Run scraper
         run: node scraper.js
