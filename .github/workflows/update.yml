@@ -1,0 +1,32 @@
+name: Update M3U File Every 2 Minutes
+
+on:
+  schedule:
+    - cron: '*/2 * * * *'  # Runs every 5 minutes
+  workflow_dispatch:  # Allows manual execution
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install playwright-extra puppeteer-extra-plugin-stealth
+
+      - name: Run scraper
+        run: node scraper.js
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add bigbrother.m3u
+          git commit -m "Updated M3U file" || exit 0
+          git push
