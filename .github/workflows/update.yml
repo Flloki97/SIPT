@@ -1,34 +1,32 @@
-name: Update M3U File Every 3 Minutes
+name: Update M3U File
 
 on:
   schedule:
-    - cron: '*/3 * * * *'  # Runs every 5 minutes
-  workflow_dispatch:  # Allows manual execution
+    - cron: "*/3 * * * *" # Runs every 5 minutes
+  push:
+    branches:
+      - main
 
 jobs:
-  update:
+  update-m3u:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+        uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: |
-          npm install playwright-extra puppeteer-extra-plugin-stealth cheerio express fs
-          npx playwright install --with-deps
+        run: npm install
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
 
       - name: Run scraper
         run: node scraper.js
 
-      - name: Commit and push changes
+      - name: Commit and push updated M3U file
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add bigbrother.m3u
-          git commit -m "Updated M3U file" || exit 0
+          git add docs/bigbrother.m3u
+          git commit -m "Updated M3U file" || echo "No changes to commit"
           git push

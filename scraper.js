@@ -2,16 +2,15 @@ const { chromium } = require('playwright-extra');
 const stealth = require('puppeteer-extra-plugin-stealth');
 const cheerio = require('cheerio');
 const fs = require('fs');
-const express = require('express');
 
 chromium.use(stealth());
 
 const urlsToScrape = [
     'https://bbvipal.net/', // First source
-    'https://bbvipal.net/' // Replace with second source URL
+    'https://bbvipal.net/'  // Replace with second source URL
 ];
 
-const m3uFilePath = 'bigbrother.m3u';
+const m3uFilePath = 'docs/bigbrother.m3u'; // Save in docs/ for GitHub Pages
 
 // Function to scrape an .m3u8 link from a given URL
 async function getM3U8(url) {
@@ -47,7 +46,7 @@ async function getM3U8(url) {
     return m3u8Url;
 }
 
-// Function to scrape both sources and update M3U file
+// Function to scrape sources and update M3U file
 async function updateM3UFile() {
     console.log("🔄 Updating M3U file...");
 
@@ -72,15 +71,3 @@ async function updateM3UFile() {
 // Update M3U file every 5 minutes
 setInterval(updateM3UFile, 5 * 60 * 1000);
 updateM3UFile(); // Run immediately on startup
-
-// Create an Express server to serve the M3U file
-const app = express();
-app.get('/bigbrother.m3u', (req, res) => {
-    res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-    res.sendFile(__dirname + '/' + m3uFilePath);
-});
-
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`📡 Server running at: http://192.168.178.130:${PORT}/bigbrother.m3u`);
-});
