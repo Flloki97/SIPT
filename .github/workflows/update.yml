@@ -18,11 +18,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Clear cache
+        run: rm -rf node_modules
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install Playwright
-        run: npx playwright install
+        run: npm exec playwright install
+
+      - name: Verify Playwright installation
+        run: npx playwright --version
 
       - name: Run scraper
         run: node scraper.js
