@@ -2,7 +2,7 @@ name: Update M3U and Deploy
 
 on:
   schedule:
-    - cron: "*/3 * * * *" # Runs every 3 minutes
+    - cron: "*/10 * * * *" # Runs every 10 minutes
   push:
     branches:
       - main
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   update-m3u:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
