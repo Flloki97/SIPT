@@ -112,7 +112,7 @@ setInterval(async () => {
         console.log("Changes detected. Triggering deployment...");
         // You can trigger a deployment here if needed
     }
-}, 3 * 60 * 1000); // 3 minutes
+}, 10 * 60 * 1000); // 10 minutes
 
 // Run immediately on startup
 updateM3UFile();
